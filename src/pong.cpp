@@ -10,17 +10,12 @@
 using namespace std;
 
 //
-// PONG
+// DEMO
 //
 
-#define FIELD_WIDTH     79
-#define FIELD_HEIGHT    24
-#define PADDLE_SIZE     5
-
-
-//
-// SCREEN STUFF
-//
+#define FIELD_WIDTH 79
+#define FIELD_HEIGHT 24
+#define PADDLE_SIZE 5
 
 void reset_screen()
 {
@@ -52,6 +47,7 @@ void init_screen()
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     init_pair(3, COLOR_BLUE, COLOR_BLACK);
     init_pair(4, COLOR_RED | COLOR_GREEN, COLOR_BLACK);
+    init_pair(5, COLOR_BLACK, COLOR_BLACK);
 
     cbreak();             // line buffering disabled
     keypad(stdscr, true); // enables F_keys
@@ -116,6 +112,8 @@ void demo()
     getch();
 }
 
+// END OF DEMO
+
 int main(int argc, char *argv[])
 {
     try
@@ -126,13 +124,14 @@ int main(int argc, char *argv[])
 
         namespace po = boost::program_options;
         po::options_description desc("Options");
-        desc.add_options()("help,h", "Print help")("value,v", po::value<string>(), "name")("option,o", "option")("demo", "demo");
+        desc.add_options()("help,h", "Print help");
+        desc.add_options()("value,v", po::value<string>(), "name");
+        desc.add_options()("demo", "demo");
 
         po::variables_map vm;
         try
         {
-            po::store(po::parse_command_line(argc, argv, desc),
-                      vm); // can throw
+            po::store(po::parse_command_line(argc, argv, desc), vm); // can throw
 
             // --help option
             if (vm.count("help"))
@@ -142,8 +141,7 @@ int main(int argc, char *argv[])
                 return 0;
             }
 
-            po::notify(vm); // throws on error, so do after help in case
-                            // there are any problems
+            po::notify(vm); // throws on error, so do after help in case there are any problems
         }
         catch (po::error &e)
         {
@@ -156,18 +154,13 @@ int main(int argc, char *argv[])
         //
         // Application code here
         //
-
-        // --option
-        if (vm.count("option"))
-        {
-            cout << "option" << endl;
-        }
-        // --value
+        // --value=
         if (vm.count("value"))
         {
             cout << "value = " << vm["value"].as<string>() << endl;
         }
 
+        // --demo
         if (vm.count("demo"))
         {
             demo();
