@@ -1,12 +1,14 @@
 #! /usr/bin/env python3
 
 """
-PUSH/PULL logging server
+PONG logging server
 """
 
 import zmq
 import datetime
 
+
+# https://gist.github.com/rene-d/9e584a7dd2935d0f461904b9f2950007
 
 # SGR color constants
 # rene-d 2018
@@ -52,28 +54,23 @@ class Colors:
             del kernel32
 
 
-def main():
+colors = {"DEBUG": Colors.LIGHT_BLACK,
+          "WARNING": Colors.YELLOW,
+          "INFO": Colors.GREEN,
+          "ERROR": Colors.RED,
+          "CRITICAL": Colors.MAGENTA}
 
-    colors = {"DEBUG": Colors.LIGHT_BLACK,
-              "WARNING": Colors.YELLOW,
-              "INFO": Colors.GREEN,
-              "ERROR": Colors.RED,
-              "CRITICAL": Colors.MAGENTA}
+context = zmq.Context()
+zmqlog = context.socket(zmq.PULL)
+zmqlog.bind("ipc:///tmp/pong_logger")
 
-    context = zmq.Context()
-    zmqlog = context.socket(zmq.PULL)
-    zmqlog.bind("ipc:///tmp/dojo_logger")
-
-    try:
-        while True:
-            msg = zmqlog.recv_multipart()
-            topic, text = map(bytes.decode, msg)
-            topic, _, level = topic.rpartition(".")
-            color = colors.get(level, Colors.BLUE)
-            d = datetime.datetime.now().isoformat()
-            print("{}{} {:8}-{:5}-{}{}".format(color, d, level, topic, text.rstrip(), Colors.END))
-    except KeyboardInterrupt:
-        pass
-
-if __name__ == '__main__':
-    main()
+try:
+    while True:
+        msg = zmqlog.recv_multipart()
+        topic, text = map(bytes.decode, msg)
+        topic, _, level = topic.rpartition(".")
+        color = colors.get(level, Colors.BLUE)
+        d = datetime.datetime.now().isoformat()
+        print(f"{color}{d} {level:8}-{topic:5}-{text.rstrip()}{Colors.END}")
+except KeyboardInterrupt:
+    pass

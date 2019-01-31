@@ -15,7 +15,7 @@ int main()
 
     //  Socket to send start of batch message on
     void *sink = zmq_socket(context, ZMQ_PULL);
-    zmq_bind(sink, "ipc:///tmp/pong_logger");
+    zmq_bind(sink, "ipc:///tmp/dojo_logger");
 
     //  Process tasks forever
     while (1) {

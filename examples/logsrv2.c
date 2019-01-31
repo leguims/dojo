@@ -60,7 +60,7 @@ static const char *get_sgr_color(zframe_t *frame)
 
 int main()
 {
-    zsock_t *sink = zsock_new_pull("ipc:///tmp/pong_logger");
+    zsock_t *sink = zsock_new_pull("ipc:///tmp/dojo_logger");
 
     while (true) {
 

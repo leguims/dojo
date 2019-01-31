@@ -40,11 +40,18 @@ enable_testing()
 # Executables
 #
 
+# main program
+add_executable(pong
+    src/pong.cpp)
+target_link_libraries(pong
+    PRIVATE ncurses zmq boost_program_options)
+
+# test/demo
 add_executable(logsrv examples/logsrv.c)
 target_link_libraries(logsrv PRIVATE zmq)
 
 add_executable(logsrv2 examples/logsrv2.c)
-target_link_libraries(logsrv2 PRIVATE zmq czmq)
+target_link_libraries(logsrv2 PRIVATE czmq)
 
 add_executable(demo examples/demo.cpp)
 target_link_libraries(demo PRIVATE ncurses)

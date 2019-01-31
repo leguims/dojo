@@ -24,7 +24,7 @@ def main():
 
     # logging with ZeroMQ
     zmqlog = context.socket(zmq.PUSH)
-    zmqlog.connect("ipc:///tmp/pong_logger")
+    zmqlog.connect("ipc:///tmp/dojo_logger")
 
     handler = zmq.log.handlers.PUBHandler(zmqlog)
 
