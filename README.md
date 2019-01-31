@@ -41,7 +41,7 @@ zeromq = sockets simplifiées
         != corba, ice, amqp, mqtt, rpc, ...
 ````
 
-* développé en mode collectif sur github
+* développé en mode collectif sur GitHub
 * léger
 * rapide
 * disponible partout et dans tous les langages
@@ -50,9 +50,7 @@ zeromq = sockets simplifiées
 
 ## Dojo
 
-### Item log : [PUSH/PULL](http://api.zeromq.org/4-2:zmq-socket#toc15)
-
-![pattern](patterns/zmq_pushpull.png)
+### log : [PUSH/PULL](http://api.zeromq.org/4-2:zmq-socket#toc15)
 
 * producteurs de traces: PUSH
 * consommateur de traces: PULL
@@ -62,6 +60,9 @@ zeromq = sockets simplifiées
 * Autre possibilité: [PUB/SUB](http://api.zeromq.org/4-2:zmq-socket#toc10)
 * Autre possibilité (DRAFT API): [RADIO/DISH](http://api.zeromq.org/4-2:zmq-socket#toc6)
 
-### Serveur -> Joueurs : PUB/SUB
+### jeu
 
-### Joueur -> Serveur : PUSH/PULL
+* Serveur -> Joueurs : PUB/SUB
+* Joueur -> Serveur : PUSH/PULL
+
+Autre possibilité: DEALER/ROUTER
