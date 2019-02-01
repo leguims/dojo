@@ -6,7 +6,6 @@ PUSH example (aka. ventilator)
 
 import zmq
 import time
-import argparse
 
 
 def main():
@@ -21,6 +20,7 @@ def main():
         n += 1
         sender.send_string(f"message {n}")
         time.sleep(1)
+
 
 if __name__ == "__main__":
     main()

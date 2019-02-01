@@ -5,8 +5,6 @@ PULL example (ventilator)
 """
 
 import zmq
-import time
-import argparse
 
 
 def main():
@@ -19,6 +17,7 @@ def main():
     while True:
         msg = sender.recv_string()
         print(msg)
+
 
 if __name__ == "__main__":
     main()

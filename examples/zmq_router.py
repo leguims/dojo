@@ -2,6 +2,7 @@
 
 import zmq
 
+
 context = zmq.Context.instance()
 client = context.socket(zmq.ROUTER)
 client.bind("tcp://*:9999")

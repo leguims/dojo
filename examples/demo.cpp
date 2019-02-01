@@ -1,8 +1,8 @@
 #include <bits/stdc++.h>
+#include <cmath>
 #include <ncurses.h>
-#include <unistd.h>
 #include <sys/time.h>
-#include <math.h>
+#include <unistd.h>
 
 void reset_screen()
 {

@@ -4,6 +4,7 @@
 
 #include <bits/stdc++.h>
 #include <boost/program_options.hpp>
+#include <cmath>
 #include <ncurses.h>
 #include <zmq.h>
 
