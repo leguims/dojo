@@ -5,8 +5,11 @@
 #include <bits/stdc++.h>
 #include <boost/program_options.hpp>
 #include <cmath>
+#include <zmq.hpp>
+#include <zmq_addon.hpp>
 #include <ncurses.h>
 #include <zmq.h>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -17,6 +20,10 @@ using namespace std;
 #define FIELD_WIDTH 79
 #define FIELD_HEIGHT 24
 #define PADDLE_SIZE 5
+
+
+zmq::context_t  context_client_log(1);
+zmq::socket_t   client_log(context_client_log, ZMQ_PUSH);
 
 void reset_screen()
 {
@@ -113,12 +120,78 @@ void demo()
     getch();
 }
 
-// END OF DEMO
+
+static void print_timestamp()
+{
+    struct timeval now;
+    char buf[sizeof "2018-11-23T09:00:00"];
+
+    gettimeofday(&now, NULL);
+    strftime(buf, sizeof buf, "%FT%T", localtime(&now.tv_sec));
+
+    printf("%s.%06ld - ", buf, (long)now.tv_usec);
+}
+
+
+#define PORT_LOG "2019"
+void logsrv()
+{
+     zmq::context_t  context(1);
+     zmq::socket_t   serveur(context, ZMQ_PULL);
+
+     serveur.bind("tcp://*:" PORT_LOG);
+
+    while (true) {
+        zmq::multipart_t msg;
+        zmq::message_t  level, source, description;
+
+        msg.recv(serveur);
+
+        // 3 parts: level, source and text
+        assert(msg.size() == 3);
+
+        print_timestamp();
+
+        // level
+        level = msg.pop();
+        fwrite(level.data(), level.size(), 1, stdout);
+
+        // source
+        printf(" - ");
+        source = msg.pop();
+        fwrite(source.data(), source.size(), 1, stdout);
+
+        // source
+        printf(" - ");
+        description = msg.pop();
+        fwrite(description.data(), description.size(), 1, stdout);
+
+        printf("\n");
+    }
+
+}
+
+void sendlog(string level, string source,string description)
+{
+
+    zmq::multipart_t msg;
+
+    msg.push(zmq::message_t(level.data(), level.size()));
+    msg.push(zmq::message_t(source.data(), source.size()));
+    msg.push(zmq::message_t(description.data(), description.size()));
+
+    msg.send(client_log, 0);
+}
+
+
 
 int main(int argc, char *argv[])
 {
     try
     {
+        //connect log client
+        client_log.connect("tcp://localhost:" PORT_LOG);
+
         //
         // Define and parse the program options
         //
@@ -127,7 +200,8 @@ int main(int argc, char *argv[])
         po::options_description desc("Options");
         desc.add_options()("help,h", "Print help");
         desc.add_options()("value,v", po::value<string>(), "name");
-        desc.add_options()("demo", "demo");
+        desc.add_options()("demo", "demonstration de ncurses");
+        desc.add_options()("logsrv", "logsrv");
 
         po::variables_map vm;
         try
@@ -164,7 +238,13 @@ int main(int argc, char *argv[])
         // --demo
         if (vm.count("demo"))
         {
+            sendlog("INFO","DEMO","Start");
             demo();
+        }
+
+        if (vm.count("logsrv"))
+        {
+            logsrv();
         }
     }
     catch (exception &e)
