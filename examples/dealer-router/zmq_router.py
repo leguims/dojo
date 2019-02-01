@@ -5,9 +5,9 @@ import zmq
 
 context = zmq.Context.instance()
 client = context.socket(zmq.ROUTER)
-client.bind("tcp://*:9999")
+client.bind("tcp://*:2020")
 
 while True:
-    ident, request = client.recv_multipart()
-    print(ident, request)
-    client.send_multipart([ident, b'OK'])
+    ident = client.recv_multipart()
+    print(ident)
+    client.send_multipart([ident[0], b'OK', b'KKKK'])
