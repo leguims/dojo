@@ -34,6 +34,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     include_directories(${CMAKE_CURRENT_BINARY_DIR}/includes)
 endif()
 
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
+
+
 enable_testing()
 
 #
@@ -47,11 +50,14 @@ target_link_libraries(pong
     PRIVATE ncurses zmq boost_program_options)
 
 # test/demo
-add_executable(logsrv examples/logsrv.c)
+add_executable(logsrv examples/push-pull/logsrv.c)
 target_link_libraries(logsrv PRIVATE zmq)
 
-add_executable(logsrv2 examples/logsrv2.c)
+add_executable(logsrv2 examples/push-pull/logsrv2.c)
 target_link_libraries(logsrv2 PRIVATE czmq)
 
-add_executable(demo examples/demo.cpp)
+add_executable(logsrv3 examples/push-pull/logsrv3.cpp)
+target_link_libraries(logsrv3 PRIVATE zmq)
+
+add_executable(demo examples/ncurses/demo.cpp)
 target_link_libraries(demo PRIVATE ncurses)

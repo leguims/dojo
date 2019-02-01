@@ -11,7 +11,6 @@ sudo apt install libncurses5-dev libzmq3-dev libczmq-dev python3-zmq
 
 [Python 3.6+](https://www.python.org/downloads/)
 
-
 ## GitHub
 
 [thales6](https://github.com/thales6)
@@ -31,7 +30,7 @@ sudo apt install libncurses5-dev libzmq3-dev libczmq-dev python3-zmq
 * [pyzmq](https://learning-0mq-with-pyzmq.readthedocs.io/)
 
 
-## ZMQ Patterns
+## ØMQ
 
 ````
 zeromq = sockets simplifiées
