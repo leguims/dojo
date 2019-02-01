@@ -30,8 +30,8 @@ zmq::socket_t client_game(context, ZMQ_DEALER);
 
 string client_name;
 
-#define MAX_Y ((FIELD_HEIGHT - PADDLE_SIZE) / 2)
-#define MIN_Y -(MAX_Y)
+#define MAX_Y ((FIELD_HEIGHT - PADDLE_SIZE) / 2-1)
+#define MIN_Y -(MAX_Y+1)
 
 struct Joueur
 {
@@ -135,7 +135,7 @@ void draw_paddle(bool left, int pos)
     int y = (FIELD_HEIGHT - PADDLE_SIZE) / 2 - pos;
 
     attron(COLOR_PAIR(5));
-    mvvline(1, x, ACS_VLINE, FIELD_HEIGHT - 1);
+    mvvline(1, x, ACS_VLINE, FIELD_HEIGHT - 2);
     attron(COLOR_PAIR(5));
 
     attron(COLOR_PAIR(4));
