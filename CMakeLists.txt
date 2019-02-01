@@ -23,10 +23,6 @@ if((CMAKE_CXX_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID MATCHES "GN
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    # brewed zeromq doesn't have cppzmq
-    file(DOWNLOAD https://raw.githubusercontent.com/zeromq/cppzmq/v4.3.0/zmq.hpp includes/zmq.hpp EXPECTED_HASH SHA1=5916eb5dd3196ec97591e64c110789341b03b678)
-    file(DOWNLOAD https://raw.githubusercontent.com/zeromq/cppzmq/v4.3.0/zmq_addon.hpp includes/zmq_addon.hpp EXPECTED_HASH SHA1=ffcfb809d128c8fd5a63ca078874f12cd4c7a517)
-
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # clang doesn't have the handy gcc STL header file
         configure_file(stdc++.h.in includes/bits/stdc++.h COPYONLY @ONLY)
@@ -35,6 +31,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 endif()
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
+
+# brewed zeromq doesn't have cppzmq
+file(DOWNLOAD https://raw.githubusercontent.com/zeromq/cppzmq/v4.3.0/zmq.hpp includes/zmq.hpp EXPECTED_HASH SHA1=5916eb5dd3196ec97591e64c110789341b03b678)
+file(DOWNLOAD https://raw.githubusercontent.com/zeromq/cppzmq/v4.3.0/zmq_addon.hpp includes/zmq_addon.hpp EXPECTED_HASH SHA1=ffcfb809d128c8fd5a63ca078874f12cd4c7a517)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/includes)
 
 
 enable_testing()
