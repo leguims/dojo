@@ -1,7 +1,9 @@
 {
     "files.associations": {
         "cstring": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iosfwd": "cpp",
+        "map": "cpp"
     },
     "cmake.configureOnOpen": false
 }
