@@ -15,16 +15,19 @@
 using namespace std;
 
 //
-// DEMO
+// PONG
 //
 
 #define FIELD_WIDTH 79
 #define FIELD_HEIGHT 24
 #define PADDLE_SIZE 5
 
+#define FIELD_BASELINE (FIELD_WIDTH / 2 - 2)
+
 #define MAX_PADDLE_POS ((FIELD_HEIGHT - PADDLE_SIZE) / 2 - 1)
 #define MIN_PADDLE_POS (-(MAX_PADDLE_POS + 1))
 
+// ball physics
 #define INITIAL_SPEED 0.4
 #define MAX_SPEED 1.7
 #define SPEED_INCREASE 1.0005
@@ -55,7 +58,7 @@ struct PlayerState
     int pos;        // y position of the paddle
     long last_seen; // timestamp of the last message
     int shots;      // shots counter
-    bool loser;    // true if cannot return the ball
+    bool loser;     // true if cannot return the ball
 
     // initial state for the player
     void reset()
@@ -83,7 +86,7 @@ struct PlayerState
 
     bool returns(int ball_y)
     {
-        bool ok = pos - PADDLE_SIZE / 2 - 1 <= ball_y && ball_y <= pos + PADDLE_SIZE / 2 + 1;
+        bool ok = ((pos - PADDLE_SIZE / 2 - 1) <= ball_y) && (ball_y <= (pos + PADDLE_SIZE / 2 + 1));
         if (ok)
             ++shots;
         else
@@ -150,13 +153,13 @@ void draw_field()
     attron(A_BOLD | COLOR_PAIR(6));
     for (int i = 0; i < FIELD_HEIGHT; i++)
     {
-        mvaddstr(i, 0, "*");
-        mvaddstr(i, FIELD_WIDTH - 1, "*");
+        mvaddch(i, 0, '*');
+        mvaddch(i, FIELD_WIDTH - 1, '*');
     }
     for (int i = 0; i < FIELD_WIDTH; i++)
     {
-        mvaddstr(0, i, "*");
-        mvaddstr(FIELD_HEIGHT - 1, i, "*");
+        mvaddch(0, i, '*');
+        mvaddch(FIELD_HEIGHT - 1, i, '*');
     }
     mvaddstr(0, (FIELD_WIDTH - 11) / 2, " ... - ... ");
     attroff(A_BOLD | COLOR_PAIR(6));
@@ -235,7 +238,7 @@ void send_server(const string &command)
 {
     zmq::multipart_t msg;
     msg.addstr(command);
-    msg.send(client_game, 0);
+    msg.send(client_game);
 }
 
 void client_graphique()
@@ -306,13 +309,16 @@ void client_graphique()
                 draw_field();
             }
 
+            // clear previous ball
             draw_ball(ball_x, ball_y, true);
 
+            // pop new ball position and draw it
             ball_x = msg.poptyp<int>();
             ball_y = msg.poptyp<int>();
 
             draw_ball(ball_x, ball_y);
 
+            // pop player state
             while (msg.size() >= 5)
             {
                 string name = msg.popstr();
@@ -326,18 +332,20 @@ void client_graphique()
 
                 if (loser)
                 {
+                    // some one has win/lose
+
                     string msg;
                     if (name == client_name)
                         msg = "  YOU LOSE !!!  ";
                     else
                         msg = "  YOU WIN !!!  ";
 
-                    int n;
-                    n = (int)msg.size();
+                    int n = (int)msg.size();
                     attron(COLOR_PAIR(7) | A_BLINK);
                     mvaddnstr(FIELD_HEIGHT / 2, (FIELD_WIDTH - n) / 2, msg.data(), n);
                     attroff(COLOR_PAIR(7) | A_BLINK);
 
+                    // the field will be updated : the above message needs to be cleared
                     redraw_field = true;
                 }
             }
@@ -398,6 +406,9 @@ inline int to_int(double x)
     return (int)lrint(x);
 }
 
+//
+// game server
+//
 void server()
 {
     zmq::socket_t server_socket(context, ZMQ_ROUTER);
@@ -412,7 +423,7 @@ void server()
     double heading = 0;
     long restart = 0;
 
-    srand(time(NULL));
+    srand((unsigned)time(NULL));
 
     while (true)
     {
@@ -420,6 +431,7 @@ void server()
 
         msg.recv(server_socket, ZMQ_DONTWAIT);
 
+        // if we received something from a client
         if (!msg.empty())
         {
             assert(msg.size() == 2);
@@ -461,7 +473,7 @@ void server()
             }
         }
 
-        // remove stuck clients
+        // remove stuck/disconnected clients
         long now = millis();
         bool stuck = false;
         for (auto &&player : players)
@@ -483,12 +495,16 @@ void server()
             }
         }
 
+        // move the ball
+        // bounce it on upper/lower borders, paddles
+        // check if a player loses
         if (speed > 0)
         {
+            // advance the ball
             ball_x += speed * cos(heading * M_PI / 180);
             ball_y += speed * sin(heading * M_PI / 180);
 
-            if (fabs(ball_x) >= 37)
+            if (fabs(ball_x) >= FIELD_BASELINE)
             {
                 bool left = ball_x < 0;
 
@@ -512,7 +528,7 @@ void server()
                         for (int i = 0; i < delta; ++i)
                             speed *= SPEED_INCREASE;
                         heading = 180 - heading + slice;
-                        ball_x = left ? -37 : 37;
+                        ball_x = left ? -FIELD_BASELINE : FIELD_BASELINE;
 
                         send_log("INFO", "GAME ENGINE",
                                  p.first + " returns, speed=" + to_string(speed) +
@@ -520,6 +536,9 @@ void server()
                     }
                     else
                     {
+                        // the player misses the ball:
+                        // stop the game
+                        // will restart in 5 s
                         send_log("INFO", "GAME ENGINE", p.first + " loses");
                         speed = 0;
                         restart = millis() + 5000;
@@ -565,6 +584,7 @@ void server()
         {
             // first part: identity of the DEALER
             zmq::multipart_t msg_update;
+
             msg_update.addstr(player.first);
 
             // second/third part: ball position X/position Y
@@ -585,6 +605,7 @@ void server()
             msg_update.send(server_socket);
         }
 
+        // update the game each 50ms
         usleep(50000);
     }
 }
