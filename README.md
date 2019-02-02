@@ -1,15 +1,4 @@
-# README
-
-
-## Prerequesites
-
-Raspberry Pi (raspbian):
-```
-sudo apt install build-essential cmake
-sudo apt install libncurses5-dev libzmq3-dev libczmq-dev python3-zmq
-```
-
-[Python 3.6+](https://www.python.org/downloads/)
+# Coding Dojo 2
 
 ## GitHub
 
@@ -24,26 +13,28 @@ sudo apt install libncurses5-dev libzmq3-dev libczmq-dev python3-zmq
 ## ZeroMQ
 
 * [Web site](http://zeromq.org/)
+* [source code](https://github.com/zeromq/libzmq)
 * [API](http://api.zeromq.org)
 * [zguide](http://zguide.zeromq.org/) [explanations](http://zguide.zeromq.org/page:all#Sending-and-Receiving-Messages)
 * [examples](https://github.com/booksbyus/zguide)
 * [pyzmq](https://learning-0mq-with-pyzmq.readthedocs.io/)
+* [cppzmq](https://github.com/zeromq/cppzmq)
 
 
 ## ØMQ
 
 ````
 zeromq = sockets simplifiées
-        ~ message-oriented middleware
-        != API de haut niveau
-        != broker
-        != corba, ice, amqp, mqtt, rpc, ...
+       ~ message-oriented middleware
+       != API de haut niveau
+       != broker
+       != corba, ice, amqp, mqtt, rpc, ...
 ````
 
 * développé en mode collectif sur GitHub
 * léger
 * rapide
-* disponible partout et dans tous les langages
+* disponible partout et pour tous les langages
 * adaptable à tous les besoins (ou presque!)
 
 
@@ -53,7 +44,7 @@ zeromq = sockets simplifiées
 
 * producteurs de traces: PUSH
 * consommateur de traces: PULL
-* transport: ipc
+* transport: ipc, tcp
 * avantages / inconvénients ?
 
 * Autre possibilité: [PUB/SUB](http://api.zeromq.org/4-2:zmq-socket#toc10)
@@ -63,5 +54,5 @@ zeromq = sockets simplifiées
 
 * Serveur -> Joueurs : PUB/SUB
 * Joueur -> Serveur : PUSH/PULL
+* Autre possibilité : [DEALER/ROUTER](http://api.zeromq.org/4-2:zmq-socket#toc24)
 
-Autre possibilité: DEALER/ROUTER
