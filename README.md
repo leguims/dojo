@@ -6,7 +6,13 @@
 Raspberry Pi (raspbian):
 ```
 sudo apt install build-essential cmake
-sudo apt install libncurses5-dev libzmq3-dev libczmq-dev python3-zmq
+sudo apt install libncurses5-dev libzmq3-dev libczmq-dev python3-zmq libboost-program-options-dev
+```
+
+For pong C++:
+```
+cmake -G "Unix Makefiles"
+make && pong --help
 ```
 
 [Python 3.6+](https://www.python.org/downloads/)
