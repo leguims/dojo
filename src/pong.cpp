@@ -300,7 +300,7 @@ void client_graphique(const string &ip_server)
 
         if (!msg.empty())
         {
-            sendlog("INFO", client_name, "Update screen from server");
+            //sendlog("INFO", client_name, "Update screen from server");
             while(msg.size()>=3){
                 /* code */
 
@@ -311,7 +311,7 @@ void client_graphique(const string &ip_server)
                     string left, y;
                     left = msg.popstr();
                     y = msg.popstr();
-                    sendlog("INFO", client_name, "Update screen : "+name+" "+left+" "+y);
+                    //sendlog("INFO", client_name, "Update screen : "+name+" "+left+" "+y);
                     draw_paddle(left=="1", stoi(y));
                 }
                 else
@@ -323,7 +323,7 @@ void client_graphique(const string &ip_server)
                     pos_y = msg.popstr();
                     direction_x = msg.popstr();
                     direction_y = msg.popstr();
-                    sendlog("INFO", client_name, "Update screen : "+BALL_NAME+" old("+old_x+", "+old_y+") "+" pos("+pos_x+", "+pos_y+") "+" dir("+direction_x+", "+direction_y+") ");
+                    //sendlog("INFO", client_name, "Update screen : "+BALL_NAME+" old("+old_x+", "+old_y+") "+" pos("+pos_x+", "+pos_y+") "+" dir("+direction_x+", "+direction_y+") ");
                     draw_ball(stoi(old_x), stoi(old_y), stoi(pos_x), stoi(pos_y));
                 }
             }
