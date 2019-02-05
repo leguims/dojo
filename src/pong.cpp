@@ -38,6 +38,7 @@ string client_name;
 #define MAX_X (FIELD_WIDTH - 3)
 #define MIN_X 2
 const string BALL_NAME("BALLE");
+const string CMD_ERROR("ERROR");
 
 void sendlog(string level, string source, string description)
 {
@@ -301,20 +302,19 @@ void client_graphique(const string &ip_server)
         if (!msg.empty())
         {
             //sendlog("INFO", client_name, "Update screen from server");
-            while(msg.size()>=3){
+            while(!msg.empty()){
                 /* code */
 
                 string name;
                 name = msg.popstr();
-                if (name != BALL_NAME)
+                if (name == CMD_ERROR)
                 {
-                    string left, y;
-                    left = msg.popstr();
-                    y = msg.popstr();
-                    //sendlog("INFO", client_name, "Update screen : "+name+" "+left+" "+y);
-                    draw_paddle(left=="1", stoi(y));
+                    string description = msg.popstr();
+                    sendlog("INFO", client_name, "Refuse by server for : "+description);
+                    // End of game
+                    return;
                 }
-                else
+                if (name == BALL_NAME)
                 {
                     string old_x, old_y, pos_x, pos_y, direction_x, direction_y;
                     old_x = msg.popstr();
@@ -325,6 +325,14 @@ void client_graphique(const string &ip_server)
                     direction_y = msg.popstr();
                     //sendlog("INFO", client_name, "Update screen : "+BALL_NAME+" old("+old_x+", "+old_y+") "+" pos("+pos_x+", "+pos_y+") "+" dir("+direction_x+", "+direction_y+") ");
                     draw_ball(stoi(old_x), stoi(old_y), stoi(pos_x), stoi(pos_y));
+                }
+                else
+                {
+                    string left, y;
+                    left = msg.popstr();
+                    y = msg.popstr();
+                    //sendlog("INFO", client_name, "Update screen : "+name+" "+left+" "+y);
+                    draw_paddle(left=="1", stoi(y));
                 }
             }
         }
@@ -427,7 +435,7 @@ void server()
             {
                 it->second.update(s_command);
             }
-            else
+            else if (mapJoueur.size() < 2)
             {
                 Joueur newjoueur;
 
@@ -441,6 +449,25 @@ void server()
                 sendlog("INFO", "GAME ENGINE", "Add new player " + s_name);
 
                 mapCote[newjoueur.left] = s_name;
+
+                if (mapJoueur.size() == 2)
+                {
+                    // Games is starting => Random direction
+                    while (balle.direction_x == 0)
+                        balle.direction_x = dist(mt);
+                    while (balle.direction_y == 0)
+                        balle.direction_y = dist(mt);
+                }
+            }
+            else
+            {
+                sendlog("INFO", "GAME ENGINE", "Cannot add new player " + s_name);
+                zmq::multipart_t msg_update;
+
+                add_str(msg_update, s_name);
+                add_str(msg_update, CMD_ERROR);
+                add_str(msg_update, "The room is full");
+                msg_update.send(serveur);
             }
         }
         // else if (errno == ETERM)
@@ -456,12 +483,6 @@ void server()
         // Manage ball
         if (mapJoueur.size() == 2)
         {
-            // Random direction
-            while (balle.direction_x == 0)
-                balle.direction_x = dist(mt);
-            while (balle.direction_y == 0)
-                balle.direction_y = dist(mt);
-            
             balle.update(mapJoueur[ mapCote[balle.pos_x < FIELD_WIDTH/2] ]);
             //sendlog("INFO", "GAME ENGINE", "Update ball : ("+to_string(balle.old_x)+", "+to_string(balle.old_y)+") => ("+to_string(balle.pos_x)+", "+to_string(balle.pos_y)+") - dir("+to_string(balle.direction_x)+", "+to_string(balle.direction_y)+")");
         }
